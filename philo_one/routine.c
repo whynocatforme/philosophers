@@ -93,6 +93,9 @@ void		*routine(void *arg)
 		}
 		pthread_mutex_unlock(&state->mtx);*/
 		eating(philo);
+		pthread_mutex_lock(&state->eat_mtx);
+		philo->eat_times++;
+		pthread_mutex_unlock(&state->eat_mtx);
 		sleeping(philo);
 		thinking(philo);
 		pthread_mutex_lock(&state->dead_mtx);
