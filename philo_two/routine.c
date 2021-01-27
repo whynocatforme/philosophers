@@ -19,10 +19,10 @@ static void	eating(t_philo *philo)
 	state = philo->state;
 	
 	//pthread_mutex_lock(&state->mtx);
-	pthread_mutex_lock(&state->forks_mtx[philo->forks[L]]);
+	sem_wait(state->forks_sem);
 	//state->forks[philo->forks[L]] = philo->idx;
 	put_msg(get_time() - state->start, philo, F);
-	pthread_mutex_lock(&state->forks_mtx[philo->forks[R]]);
+	sem_wait(state->forks_sem);
 	//state->forks[philo->forks[R]] = philo->idx;
 	put_msg(get_time() - state->start, philo, F);
 	//pthread_mutex_unlock(&state->mtx);
@@ -31,9 +31,9 @@ static void	eating(t_philo *philo)
 	put_msg(philo->last_meal - state->start, philo, E);
 	ft_sleep(state->eat);
 	//state->forks[philo->forks[L]] = -1;
-	pthread_mutex_unlock(&state->forks_mtx[philo->forks[L]]);
+	sem_post(state->forks_sem);
 	//state->forks[philo->forks[R]] = -1;
-	pthread_mutex_unlock(&state->forks_mtx[philo->forks[R]]);
+	sem_post(state->forks_sem);
 }
 
 static void	sleeping(t_philo *philo)
@@ -47,29 +47,6 @@ static void thinking(t_philo *philo)
 	put_msg(get_time() - philo->state->start, philo, T);
 }
 
-void		*check(void *arg)
-{
-	t_philo *philo;
-
-	philo = (t_philo*)arg;
-	pthread_mutex_lock(&philo->state->dead_mtx);
-	while (!philo->state->dead)
-	{
-		pthread_mutex_unlock(&philo->state->dead_mtx);
-		if (get_time() - philo->last_meal > philo->state->die)
-		{
-			put_msg(get_time() - philo->state->start, philo, D);
-			pthread_mutex_lock(&philo->state->dead_mtx);
-			philo->state->dead++;
-			pthread_mutex_unlock(&philo->state->dead_mtx);
-			return NULL;
-		}
-		pthread_mutex_lock(&philo->state->dead_mtx);
-	}
-	pthread_mutex_unlock(&philo->state->dead_mtx);
-	return NULL;
-}
-
 void		*routine(void *arg)
 {
 	t_philo *philo;
@@ -81,11 +58,10 @@ void		*routine(void *arg)
 		ft_sleep(100);
 	state = philo->state;
 	philo->last_meal = get_time();
-	//pthread_create(&chk, NULL, check, philo);
-	pthread_mutex_lock(&state->dead_mtx);
+	sem_wait(state->dead_sem);
 	while (!state->dead)
 	{
-		pthread_mutex_unlock(&state->dead_mtx);
+		sem_post(state->dead_sem);
 		/*pthread_mutex_lock(&state->mtx);
 		if (state->forks[philo->forks[L]] != -1 || state->forks[philo->forks[R]] != -1) {
 			pthread_mutex_unlock(&state->mtx);
@@ -93,14 +69,13 @@ void		*routine(void *arg)
 		}
 		pthread_mutex_unlock(&state->mtx);*/
 		eating(philo);
-		pthread_mutex_lock(&state->eat_mtx);
+		sem_wait(state->dead_sem);
 		philo->eat_times++;
-		pthread_mutex_unlock(&state->eat_mtx);
+		sem_post(state->dead_sem);
 		sleeping(philo);
 		thinking(philo);
-		pthread_mutex_lock(&state->dead_mtx);
+		sem_wait(state->dead_sem);
 	}
-	pthread_mutex_unlock(&state->dead_mtx);
-	//pthread_detach(chk);
+	sem_post(state->dead_sem);
 	return (NULL);
 }

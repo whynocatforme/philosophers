@@ -19,10 +19,6 @@ static t_philo* init_philo(t_state *state, int idx)
 	ret = (t_philo*)malloc(sizeof(t_philo));
 	ret->idx = idx;
 	ret->state = state;
-	ret->forks[L] = !idx? state->num - 1 : idx - 1;
-	ret->forks[R] = idx;
-	pthread_mutex_init(&state->forks_mtx[idx], NULL);
-	state->forks[idx] = -1;
 	ret->eat_times = 0;
 	ret->last_meal = get_time();
 	return (ret);
@@ -34,15 +30,12 @@ static t_state*	init_state(int argc, char **argv)
 	int		i;
 
 	ret = (t_state*)malloc(sizeof(t_state));
-	pthread_mutex_init(&ret->mtx, NULL);
 	ret->dead = 0;
 	ret->num = ft_atoi(argv[1]);
 	ret->die = ft_atoi(argv[2]);
 	ret->eat = ft_atoi(argv[3]);
 	ret->sleep = ft_atoi(argv[4]);
 	ret->times = argc == 5 ? -1 : ft_atoi(argv[5]);
-	ret->forks = (int*)malloc(sizeof(int) * ret->num);
-	ret->forks_mtx = (pthread_mutex_t*)malloc(sizeof(pthread_mutex_t) * ret->num);
 	ret->philos = (t_philo**)malloc(sizeof(t_philo*) * (ret->num + 1));
 	i = -1;
 	while (++i < ret->num)
@@ -58,31 +51,29 @@ static void		*check(void *arg)
 	int		is_full;
 
 	state = (t_state*)arg;
-	pthread_mutex_lock(&state->dead_mtx);
+	sem_wait(state->dead_sem);
 	while (!state->dead)
 	{
 		is_full = state->times == -1 ? 0 : 1;
-		pthread_mutex_unlock(&state->dead_mtx);
+		sem_post(state->dead_sem);
 		i = -1;
 		while (++i < state->num)
 		{
-			pthread_mutex_lock(&state->eat_mtx);
 			if (state->philos[i]->eat_times < state->times)
 				is_full = 0;
-			pthread_mutex_unlock(&state->eat_mtx);
 			if (get_time() - state->philos[i]->last_meal > state->die)
 			{
 				put_msg(get_time() - state->start, state->philos[i], D);
-				pthread_mutex_lock(&state->dead_mtx);
+				sem_wait(state->dead_sem);
 				state->dead++;
-				pthread_mutex_unlock(&state->dead_mtx);
+				sem_post(state->dead_sem);
 			}
 		}
-		pthread_mutex_lock(&state->dead_mtx);
+		sem_wait(state->dead_sem);
 		if (is_full)
 			state->dead++;
 	}
-	pthread_mutex_unlock(&state->dead_mtx);
+	sem_post(state->dead_sem);
 	return NULL;
 }
 
@@ -93,9 +84,12 @@ static void		create_threads(t_state *state)
 
 	state->start = get_time();
 	i = -1;
-	pthread_mutex_init(&state->write_mtx, NULL);
-	pthread_mutex_init(&state->dead_mtx, NULL);
-	pthread_mutex_init(&state->eat_mtx, NULL);
+	sem_unlink("/forks");
+	sem_unlink("/write");
+	sem_unlink("/dead");
+	state->forks_sem = sem_open("/forks", O_CREAT | O_EXCL, S_IRWXU, state->num);
+	state->write_sem = sem_open("/write", O_CREAT | O_EXCL, S_IRWXU, 1);
+	state->dead_sem = sem_open("/dead", O_CREAT | O_EXCL, S_IRWXU, 1);
 	while (++i < state->num)
 		pthread_create(&state->philos[i]->pid, NULL, &routine, state->philos[i]);
 	i = -1;

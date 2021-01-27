@@ -16,10 +16,6 @@ static void	free_state(t_state *s)
 {
 	int i;
 
-	if (s->forks)
-		free(s->forks);
-	if (s->forks_mtx)
-		free(s->forks_mtx);
 	if (s->philos)
 	{
 		i = -1;
@@ -30,23 +26,21 @@ static void	free_state(t_state *s)
 	free(s);
 }
 
-static void	destroy_mutex(t_state *s)
+static void	close_sem(t_state *s)
 {
-	int i;
-
-	pthread_mutex_destroy(&s->mtx);
-	pthread_mutex_destroy(&s->dead_mtx);
-	pthread_mutex_destroy(&s->write_mtx);
-	i = -1;
-	while (++i < s->num)
-		pthread_mutex_destroy(&s->forks_mtx[i]);
+	sem_close(s->forks_sem);
+	sem_close(s->dead_sem);
+	sem_close(s->write_sem);
+	sem_unlink("/forks");
+	sem_unlink("/write");
+	sem_unlink("/dead");
 }
 
 int			ft_exit(t_state *s, const char *msg)
 {
 	if (s)
 	{
-		destroy_mutex(s);
+		close_sem(s);
 		free_state(s);
 	}
 	if (msg)
