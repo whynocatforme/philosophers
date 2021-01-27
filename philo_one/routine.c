@@ -29,7 +29,7 @@ static void	eating(t_philo *philo)
 	
 	philo->last_meal = get_time();
 	put_msg(philo->last_meal - state->start, philo, E);
-	ft_sleep(state->eat * 1000);
+	ft_sleep(state->eat);
 	//state->forks[philo->forks[L]] = -1;
 	pthread_mutex_unlock(&state->forks_mtx[philo->forks[L]]);
 	//state->forks[philo->forks[R]] = -1;
@@ -39,7 +39,7 @@ static void	eating(t_philo *philo)
 static void	sleeping(t_philo *philo)
 {
 	put_msg(get_time() - philo->state->start, philo, S);
-	ft_sleep(philo->state->sleep * 1000);
+	ft_sleep(philo->state->sleep);
 }
 
 static void thinking(t_philo *philo)

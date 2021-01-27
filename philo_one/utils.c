@@ -64,7 +64,7 @@ long	get_time(void)
 	struct timeval now;
 
 	gettimeofday(&now, NULL);
-	return (now.tv_sec * 1000L + now.tv_usec / 1000);
+	return (now.tv_sec * 1000L + now.tv_usec / 1000L);
 }
 
 int		ft_strlen(const char *str)
