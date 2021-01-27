@@ -12,7 +12,7 @@
 
 #include "philosophers.h"
 
-int		get_time(struct timeval start)
+int		get_time(0, struct timeval start)
 {
 	struct timeval now;
 

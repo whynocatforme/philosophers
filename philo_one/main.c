@@ -65,9 +65,9 @@ static void		*check(void *arg)
 		i = -1;
 		while (++i < state->num)
 		{
-			if (get_time(state->philos[i]->last_meal) > state->die)
+			if (get_time(0, state->philos[i]->last_meal) > state->die)
 			{
-				printf("%-5d %d died\n", get_time(state->start_time), i);
+				printf("%-5d %d died\n", get_time(0, state->start_time), i);
 				pthread_mutex_lock(&state->dead_mtx);
 				state->dead++;
 				pthread_mutex_unlock(&state->dead_mtx);

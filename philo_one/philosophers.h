@@ -58,6 +58,6 @@ void				*routine(void *arg);
 int					ft_strlen(const char *str);
 int					ft_exit(t_state *s, const char *msg);
 int					ft_atoi(char *str);
-int					get_time(struct timeval start);
+int					get_time(0, struct timeval start);
 
 #endif
