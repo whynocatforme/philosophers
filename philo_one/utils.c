@@ -11,14 +11,45 @@
 /* ************************************************************************** */
 
 #include "philosophers.h"
+#include <stdio.h>
 
-int		get_time(0, struct timeval start)
+static void	ft_putnbr(int n)
+{
+	unsigned int	n2;
+	char			c;
+
+	if (n < 0)
+		write(1, "-", 1);
+	n2 = n < 0 ? (unsigned int)(n * (-1)) : (unsigned int)n;
+	if (n2 >= 10)
+		ft_putnbr(n2 / 10);
+	c = n2 % 10 + '0';
+	write(1, &c, 1);
+}
+
+void	put_msg(long time, t_philo *philo, const char *act)
+{
+	pthread_mutex_lock(&philo->state->dead_mtx);
+	if (philo->state->dead)
+	{
+		pthread_mutex_unlock(&philo->state->dead_mtx);
+		return ;
+	}
+	pthread_mutex_unlock(&philo->state->dead_mtx);
+	pthread_mutex_lock(&philo->state->write_mtx);
+	ft_putnbr((int)time);
+	write(1, " ", 1);
+	ft_putnbr(philo->idx + 1);
+	write(1, act, ft_strlen(act));
+	pthread_mutex_unlock(&philo->state->write_mtx);
+}
+
+long	get_time(void)
 {
 	struct timeval now;
 
 	gettimeofday(&now, NULL);
-	return ((int)(now.tv_sec * 1000L + now.tv_usec / 1000 -\
-				start.tv_sec * 1000L - start.tv_usec / 1000));
+	return (now.tv_sec * 1000L + now.tv_usec / 1000);
 }
 
 int		ft_strlen(const char *str)

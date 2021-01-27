@@ -18,6 +18,8 @@ static void	free_state(t_state *s)
 
 	if (s->forks)
 		free(s->forks);
+	if (s->forks_mtx)
+		free(s->forks_mtx);
 	if (s->philos)
 	{
 		i = -1;
@@ -28,10 +30,25 @@ static void	free_state(t_state *s)
 	free(s);
 }
 
+static void	destroy_mutex(t_state *s)
+{
+	int i;
+
+	pthread_mutex_destroy(&s->mtx);
+	pthread_mutex_destroy(&s->dead_mtx);
+	pthread_mutex_destroy(&s->write_mtx);
+	i = -1;
+	while (++i < s->num)
+		pthread_mutex_destroy(&s->forks_mtx[i]);
+}
+
 int			ft_exit(t_state *s, const char *msg)
 {
 	if (s)
+	{
+		destroy_mutex(s);
 		free_state(s);
+	}
 	if (msg)
 	{
 		write(1, msg, ft_strlen(msg));

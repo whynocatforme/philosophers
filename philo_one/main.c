@@ -23,6 +23,7 @@ static t_philo* init_philo(t_state *state, int idx)
 	ret->forks[R] = idx;
 	pthread_mutex_init(&state->forks_mtx[idx], NULL);
 	state->forks[idx] = -1;
+	ret->last_meal = get_time();
 	return (ret);
 }
 
@@ -65,9 +66,9 @@ static void		*check(void *arg)
 		i = -1;
 		while (++i < state->num)
 		{
-			if (get_time(0, state->philos[i]->last_meal) > state->die)
+			if (get_time() - state->philos[i]->last_meal > state->die)
 			{
-				printf("%-5d %d died\n", get_time(0, state->start_time), i);
+				put_msg(get_time() - state->start, state->philos[i], D);
 				pthread_mutex_lock(&state->dead_mtx);
 				state->dead++;
 				pthread_mutex_unlock(&state->dead_mtx);
@@ -84,13 +85,15 @@ static void		create_threads(t_state *state)
 	int i;
 	pthread_t dead_pid;
 
-	gettimeofday(&state->start_time, NULL);
+	state->start = get_time();
 	i = -1;
+	pthread_mutex_init(&state->write_mtx, NULL);
+	pthread_mutex_init(&state->dead_mtx, NULL);
 	while (++i < state->num)
 		pthread_create(&state->philos[i]->pid, NULL, &routine, state->philos[i]);
 	i = -1;
-	pthread_mutex_init(&state->dead_mtx, NULL);
-	pthread_create(&dead_pid[i], NULL, &check, state);
+	pthread_create(&dead_pid, NULL, &check, state);
+	pthread_join(dead_pid, NULL);
 	while (++i < state->num)
 		pthread_join(state->philos[i]->pid, NULL);
 }
