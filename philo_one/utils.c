@@ -22,7 +22,7 @@ void		ft_sleep(long time)
 	while (1)
 	{
 		now = get_time();
-		if (now - start_time > time)
+		if (now - start > time)
 			return ;
 		usleep(100);
 	}

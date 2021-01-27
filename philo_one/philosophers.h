@@ -62,5 +62,6 @@ int					ft_exit(t_state *s, const char *msg);
 int					ft_atoi(char *str);
 long				get_time(void);
 void				put_msg(long time, t_philo *philo, const char *act);
+void				ft_sleep(long time);
 
 #endif
