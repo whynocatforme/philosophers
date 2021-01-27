@@ -6,7 +6,7 @@
 /*   By: yapark <yapark@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 22:12:14 by yapark            #+#    #+#             */
-/*   Updated: 2021/01/28 02:30:50 by yapark           ###   ########.fr       */
+/*   Updated: 2021/01/28 05:08:06 by yapark           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,14 +18,14 @@ static void	eating(t_philo *philo)
 
 	state = philo->state;
 	
-	pthread_mutex_lock(&state->mtx);
+	//pthread_mutex_lock(&state->mtx);
 	pthread_mutex_lock(&state->forks_mtx[philo->forks[L]]);
 	//state->forks[philo->forks[L]] = philo->idx;
 	put_msg(get_time() - state->start, philo, F);
 	pthread_mutex_lock(&state->forks_mtx[philo->forks[R]]);
 	//state->forks[philo->forks[R]] = philo->idx;
 	put_msg(get_time() - state->start, philo, F);
-	pthread_mutex_unlock(&state->mtx);
+	//pthread_mutex_unlock(&state->mtx);
 	
 	philo->last_meal = get_time();
 	put_msg(philo->last_meal - state->start, philo, E);
@@ -53,8 +53,8 @@ void		*routine(void *arg)
 	t_state *state;
 
 	philo = (t_philo*)arg;
-	if (!(philo->idx % 2))
-		usleep(1000);
+	if (philo->idx % 2)
+		usleep(100);
 	state = philo->state;
 	philo->last_meal = get_time();
 	pthread_mutex_lock(&state->dead_mtx);
