@@ -6,7 +6,7 @@
 /*   By: yapark <yapark@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 20:51:44 by yapark            #+#    #+#             */
-/*   Updated: 2021/01/27 21:44:58 by yapark           ###   ########.fr       */
+/*   Updated: 2021/01/28 00:56:18 by yapark           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -28,7 +28,7 @@ static void	free_state(t_state *s)
 	free(s);
 }
 
-int	ft_exit(t_state *s, const char *msg)
+int			ft_exit(t_state *s, const char *msg)
 {
 	if (s)
 		free_state(s);

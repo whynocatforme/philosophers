@@ -6,11 +6,20 @@
 /*   By: yapark <yapark@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 20:54:48 by yapark            #+#    #+#             */
-/*   Updated: 2021/01/27 21:29:08 by yapark           ###   ########.fr       */
+/*   Updated: 2021/01/28 01:57:46 by yapark           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
+
+int		get_time(struct timeval start)
+{
+	struct timeval now;
+
+	gettimeofday(&now, NULL);
+	return ((int)(now.tv_sec * 1000L + now.tv_usec / 1000 -\
+				start.tv_sec * 1000L - start.tv_usec / 1000));
+}
 
 int		ft_strlen(const char *str)
 {
