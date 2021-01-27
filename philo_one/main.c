@@ -6,7 +6,7 @@
 /*   By: yapark <yapark@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 20:47:30 by yapark            #+#    #+#             */
-/*   Updated: 2021/01/28 05:17:12 by yapark           ###   ########.fr       */
+/*   Updated: 2021/01/28 06:56:51 by yapark           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -99,8 +99,8 @@ static void		create_threads(t_state *state)
 	while (++i < state->num)
 		pthread_create(&state->philos[i]->pid, NULL, &routine, state->philos[i]);
 	i = -1;
-	//pthread_create(&dead_pid, NULL, &check, state);
-	//pthread_join(dead_pid, NULL);
+	pthread_create(&dead_pid, NULL, &check, state);
+	pthread_join(dead_pid, NULL);
 	while (++i < state->num)
 		pthread_join(state->philos[i]->pid, NULL);
 }

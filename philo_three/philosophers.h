@@ -34,6 +34,7 @@ typedef struct		s_philo
 	int				idx;
 	int				forks[2];
 	int				doing;
+	int				eat_times;
 	pthread_t		pid;
 	pthread_t		chk_pid;
 	long			last_meal;
@@ -46,11 +47,13 @@ typedef struct		s_state
 	pthread_mutex_t	*forks_mtx;
 	pthread_mutex_t	mtx; //???
 	pthread_mutex_t dead_mtx;
+	pthread_mutex_t eat_mtx;
 	pthread_mutex_t	write_mtx;
 	int				dead;
 	int				num;
 	int				die;
 	int				eat;
+	int				finished;
 	int				sleep;
 	int				times;
 	long			start;
