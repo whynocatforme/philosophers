@@ -47,16 +47,42 @@ static void thinking(t_philo *philo)
 	put_msg(get_time() - philo->state->start, philo, T);
 }
 
+void		*check(void *arg)
+{
+	t_philo *philo;
+
+	philo = (t_philo*)arg;
+	pthread_mutex_lock(&philo->state->dead_mtx);
+	while (!philo->state->dead)
+	{
+		pthread_mutex_unlock(&philo->state->dead_mtx);
+		if (get_time() - philo->last_meal > philo->state->die)
+		{
+			pthread_mutex_lock(&philo->state->dead_mtx);
+			write(1, "here\n", 5);
+			put_msg(get_time() - philo->state->start, philo, D);
+			philo->state->dead++;
+			pthread_mutex_unlock(&philo->state->dead_mtx);
+			return NULL;
+		}
+		pthread_mutex_lock(&philo->state->dead_mtx);
+	}
+	pthread_mutex_unlock(&philo->state->dead_mtx);
+	return NULL;
+}
+
 void		*routine(void *arg)
 {
 	t_philo *philo;
 	t_state *state;
+	pthread_t chk;
 
 	philo = (t_philo*)arg;
 	if (philo->idx % 2)
 		usleep(100);
 	state = philo->state;
 	philo->last_meal = get_time();
+	pthread_create(&chk, NULL, check, philo);
 	pthread_mutex_lock(&state->dead_mtx);
 	while (!state->dead)
 	{
@@ -73,5 +99,6 @@ void		*routine(void *arg)
 		pthread_mutex_lock(&state->dead_mtx);
 	}
 	pthread_mutex_unlock(&state->dead_mtx);
+	pthread_detach(chk);
 	return (NULL);
 }
