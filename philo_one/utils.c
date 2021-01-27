@@ -6,12 +6,27 @@
 /*   By: yapark <yapark@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 20:54:48 by yapark            #+#    #+#             */
-/*   Updated: 2021/01/28 01:57:46 by yapark           ###   ########.fr       */
+/*   Updated: 2021/01/28 05:48:32 by yapark           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "philosophers.h"
 #include <stdio.h>
+
+void		ft_sleep(long time)
+{
+	long start;
+	long now;
+
+	start = get_time();
+	while (1)
+	{
+		now = get_time();
+		if (now - start_time > time)
+			return ;
+		usleep(100);
+	}
+}
 
 static void	ft_putnbr(int n)
 {

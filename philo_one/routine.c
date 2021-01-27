@@ -6,7 +6,7 @@
 /*   By: yapark <yapark@student.42seoul.kr>         +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/01/27 22:12:14 by yapark            #+#    #+#             */
-/*   Updated: 2021/01/28 05:08:06 by yapark           ###   ########.fr       */
+/*   Updated: 2021/01/28 05:42:01 by yapark           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -82,7 +82,7 @@ void		*routine(void *arg)
 		usleep(100);
 	state = philo->state;
 	philo->last_meal = get_time();
-	pthread_create(&chk, NULL, check, philo);
+	//pthread_create(&chk, NULL, check, philo);
 	pthread_mutex_lock(&state->dead_mtx);
 	while (!state->dead)
 	{
@@ -99,6 +99,6 @@ void		*routine(void *arg)
 		pthread_mutex_lock(&state->dead_mtx);
 	}
 	pthread_mutex_unlock(&state->dead_mtx);
-	pthread_detach(chk);
+	//pthread_detach(chk);
 	return (NULL);
 }
