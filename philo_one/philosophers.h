@@ -36,7 +36,6 @@ typedef struct		s_philo
 	int				doing;
 	int				eat_times;
 	pthread_t		pid;
-	pthread_t		chk_pid;
 	long			last_meal;
 }					t_philo;
 
