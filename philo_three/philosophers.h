@@ -13,11 +13,17 @@
 #ifndef PHILOSOPHERS_H
 # define PHILOSOPHERS_H
 
+#include <stdio.h>
 # include <unistd.h>
 # include <string.h>
 # include <stdlib.h>
 # include <pthread.h>
 # include <sys/time.h>
+# include <semaphore.h>
+# include <fcntl.h>
+# include <sys/stat.h>
+# include <signal.h>
+# include <sys/wait.h>
 # define F " has taken a fork\n"
 # define E " is eating\n"
 # define S " is sleeping\n"
@@ -32,23 +38,18 @@ typedef struct		s_philo
 {
 	struct s_state	*state;
 	int				idx;
-	int				forks[2];
 	int				doing;
 	int				eat_times;
-	pthread_t		pid;
-	pthread_t		chk_pid;
+	pid_t			pid;
 	long			last_meal;
 }					t_philo;
 
 typedef struct		s_state
 {
 	t_philo			**philos;
-	int				*forks;
-	pthread_mutex_t	*forks_mtx;
-	pthread_mutex_t	mtx; //???
-	pthread_mutex_t dead_mtx;
-	pthread_mutex_t eat_mtx;
-	pthread_mutex_t	write_mtx;
+	sem_t			*forks_sem;
+	sem_t			*write_sem;
+	sem_t			*dead_sem;
 	int				dead;
 	int				num;
 	int				die;

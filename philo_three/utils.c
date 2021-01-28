@@ -44,19 +44,16 @@ static void	ft_putnbr(int n)
 
 void	put_msg(long time, t_philo *philo, const char *act)
 {
-	pthread_mutex_lock(&philo->state->dead_mtx);
 	if (philo->state->dead)
 	{
-		pthread_mutex_unlock(&philo->state->dead_mtx);
 		return ;
 	}
-	pthread_mutex_unlock(&philo->state->dead_mtx);
-	pthread_mutex_lock(&philo->state->write_mtx);
+	sem_wait(philo->state->write_sem);
 	ft_putnbr((int)time);
 	write(1, " ", 1);
 	ft_putnbr(philo->idx + 1);
 	write(1, act, ft_strlen(act));
-	pthread_mutex_unlock(&philo->state->write_mtx);
+	sem_post(philo->state->write_sem);
 }
 
 long	get_time(void)

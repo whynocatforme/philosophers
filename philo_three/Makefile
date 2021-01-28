@@ -12,7 +12,7 @@
 
 SRC	= main.c routine.c exit.c utils.c
 OBJ = $(SRC:.c=.o)
-NAME = philo_one
+NAME = philo_three
 RM = rm -rf
 CC = gcc
 FLAGS = -Wall -Wextra -Werror -g -fsanitize=address
