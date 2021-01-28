@@ -16,8 +16,6 @@ static void	free_state(t_state *s)
 {
 	int i;
 
-	if (s->forks)
-		free(s->forks);
 	if (s->forks_mtx)
 		free(s->forks_mtx);
 	if (s->philos)
@@ -34,7 +32,7 @@ static void	destroy_mutex(t_state *s)
 {
 	int i;
 
-	pthread_mutex_destroy(&s->mtx);
+	pthread_mutex_destroy(&s->taking_forks);
 	pthread_mutex_destroy(&s->dead_mtx);
 	pthread_mutex_destroy(&s->write_mtx);
 	i = -1;

@@ -11,7 +11,6 @@
 /* ************************************************************************** */
 
 #include "philosophers.h"
-#include <stdio.h>
 
 void		ft_sleep(long time)
 {
@@ -42,12 +41,10 @@ static void	ft_putnbr(int n)
 	write(1, &c, 1);
 }
 
-void	put_msg(long time, t_philo *philo, const char *act)
+void		put_msg(long time, t_philo *philo, const char *act)
 {
 	if (philo->state->dead)
-	{
 		return ;
-	}
 	sem_wait(philo->state->write_sem);
 	ft_putnbr((int)time);
 	write(1, " ", 1);
@@ -56,15 +53,7 @@ void	put_msg(long time, t_philo *philo, const char *act)
 	sem_post(philo->state->write_sem);
 }
 
-long	get_time(void)
-{
-	struct timeval now;
-
-	gettimeofday(&now, NULL);
-	return (now.tv_sec * 1000L + now.tv_usec / 1000L);
-}
-
-int		ft_strlen(const char *str)
+int			ft_strlen(const char *str)
 {
 	int i;
 
@@ -76,7 +65,7 @@ int		ft_strlen(const char *str)
 	return (i);
 }
 
-int		ft_atoi(char *str)
+int			ft_atoi(char *str)
 {
 	int				i;
 	int				op;

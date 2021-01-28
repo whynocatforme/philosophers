@@ -33,7 +33,6 @@ typedef struct		s_philo
 	struct s_state	*state;
 	int				idx;
 	int				forks[2];
-	int				doing;
 	int				eat_times;
 	pthread_t		pid;
 	long			last_meal;
@@ -42,22 +41,22 @@ typedef struct		s_philo
 typedef struct		s_state
 {
 	t_philo			**philos;
-	int				*forks;
+	pthread_mutex_t	taking_forks;
 	pthread_mutex_t	*forks_mtx;
-	pthread_mutex_t	mtx; //???
 	pthread_mutex_t dead_mtx;
 	pthread_mutex_t eat_mtx;
 	pthread_mutex_t	write_mtx;
+	int				full;
 	int				dead;
 	int				num;
 	int				die;
 	int				eat;
-	int				finished;
 	int				sleep;
 	int				times;
 	long			start;
 }					t_state;
 
+t_state				*init_state(int argc, char **argv);
 void				*routine(void *arg);
 int					ft_strlen(const char *str);
 int					ft_exit(t_state *s, const char *msg);

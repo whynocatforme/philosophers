@@ -31,9 +31,15 @@ static void	close_sem(t_state *s)
 	sem_close(s->forks_sem);
 	sem_close(s->dead_sem);
 	sem_close(s->write_sem);
+	sem_close(s->taking_sem);
+	sem_close(s->eat_sem);
+	sem_close(s->full_sem);
 	sem_unlink("/forks");
 	sem_unlink("/write");
 	sem_unlink("/dead");
+	sem_unlink("/full");
+	sem_unlink("/eat");
+	sem_unlink("/taking");
 }
 
 int			ft_exit(t_state *s, const char *msg)

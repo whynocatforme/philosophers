@@ -42,7 +42,7 @@ static void	ft_putnbr(int n)
 	write(1, &c, 1);
 }
 
-void	put_msg(long time, t_philo *philo, const char *act)
+void		put_msg(long time, t_philo *philo, const char *act)
 {
 	sem_wait(philo->state->dead_sem);
 	if (philo->state->dead)
@@ -50,6 +50,8 @@ void	put_msg(long time, t_philo *philo, const char *act)
 		sem_post(philo->state->dead_sem);
 		return ;
 	}
+	if (act == D)
+		philo->state->dead++;
 	sem_post(philo->state->dead_sem);
 	sem_wait(philo->state->write_sem);
 	ft_putnbr((int)time);
@@ -59,15 +61,7 @@ void	put_msg(long time, t_philo *philo, const char *act)
 	sem_post(philo->state->write_sem);
 }
 
-long	get_time(void)
-{
-	struct timeval now;
-
-	gettimeofday(&now, NULL);
-	return (now.tv_sec * 1000L + now.tv_usec / 1000L);
-}
-
-int		ft_strlen(const char *str)
+int			ft_strlen(const char *str)
 {
 	int i;
 
@@ -79,7 +73,7 @@ int		ft_strlen(const char *str)
 	return (i);
 }
 
-int		ft_atoi(char *str)
+int			ft_atoi(char *str)
 {
 	int				i;
 	int				op;

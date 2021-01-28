@@ -10,7 +10,7 @@
 #                                                                              #
 # **************************************************************************** #
 
-SRC	= main.c routine.c exit.c utils.c
+SRC	= main.c init.c routine.c exit.c utils.c
 OBJ = $(SRC:.c=.o)
 NAME = philo_one
 RM = rm -rf

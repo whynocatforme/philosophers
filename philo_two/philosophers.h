@@ -26,8 +26,6 @@
 # define S " is sleeping\n"
 # define T " is thinking\n"
 # define D " died\n"
-# define L 0
-# define R 1
 
 struct s_state;
 
@@ -35,7 +33,6 @@ typedef struct		s_philo
 {
 	struct s_state	*state;
 	int				idx;
-	int				doing;
 	int				eat_times;
 	pthread_t		pid;
 	long			last_meal;
@@ -47,16 +44,19 @@ typedef struct		s_state
 	sem_t			*forks_sem;
 	sem_t			*write_sem;
 	sem_t			*dead_sem;
+	sem_t			*taking_sem;
+	sem_t			*eat_sem;
+	int				full;
 	int				dead;
 	int				num;
 	int				die;
 	int				eat;
-	int				finished;
 	int				sleep;
 	int				times;
 	long			start;
 }					t_state;
 
+t_state				*init_state(int argc, char **argv);
 void				*routine(void *arg);
 int					ft_strlen(const char *str);
 int					ft_exit(t_state *s, const char *msg);

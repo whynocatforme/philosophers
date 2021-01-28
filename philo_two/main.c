@@ -12,89 +12,56 @@
 
 #include "philosophers.h"
 
-static t_philo* init_philo(t_state *state, int idx)
+long			get_time(void)
 {
-	t_philo *ret;
+	struct timeval now;
 
-	ret = (t_philo*)malloc(sizeof(t_philo));
-	ret->idx = idx;
-	ret->state = state;
-	ret->eat_times = 0;
-	ret->last_meal = get_time();
-	return (ret);
-}
-
-static t_state*	init_state(int argc, char **argv)
-{
-	t_state	*ret;
-	int		i;
-
-	ret = (t_state*)malloc(sizeof(t_state));
-	ret->dead = 0;
-	ret->num = ft_atoi(argv[1]);
-	ret->die = ft_atoi(argv[2]);
-	ret->eat = ft_atoi(argv[3]);
-	ret->sleep = ft_atoi(argv[4]);
-	ret->times = argc == 5 ? -1 : ft_atoi(argv[5]);
-	ret->philos = (t_philo**)malloc(sizeof(t_philo*) * (ret->num + 1));
-	i = -1;
-	while (++i < ret->num)
-		ret->philos[i] = init_philo(ret, i);
-	ret->philos[i] = NULL;
-	return (ret);
+	gettimeofday(&now, NULL);
+	return (now.tv_sec * 1000L + now.tv_usec / 1000L);
 }
 
 static void		*check(void *arg)
 {
-	t_state *state;
+	t_state *s;
 	int		i;
-	int		is_full;
 
-	state = (t_state*)arg;
-	sem_wait(state->dead_sem);
-	while (!state->dead)
+	s = (t_state*)arg;
+	sem_wait(s->dead_sem);
+	while (!s->dead)
 	{
-		is_full = state->times == -1 ? 0 : 1;
-		sem_post(state->dead_sem);
+		sem_post(s->dead_sem);
 		i = -1;
-		while (++i < state->num)
+		s->full = 1;
+		while (++i < s->num)
 		{
-			if (state->philos[i]->eat_times < state->times)
-				is_full = 0;
-			if (get_time() - state->philos[i]->last_meal > state->die)
-			{
-				put_msg(get_time() - state->start, state->philos[i], D);
-				sem_wait(state->dead_sem);
-				state->dead++;
-				sem_post(state->dead_sem);
-			}
+			sem_wait(s->eat_sem);
+			if (s->times == -1 || s->philos[i]->eat_times < s->times)
+				s->full = 0;
+			if (get_time() - s->philos[i]->last_meal > s->die)
+				put_msg(get_time() - s->start, s->philos[i], D);
+			sem_post(s->eat_sem);
 		}
-		sem_wait(state->dead_sem);
-		if (is_full)
-			state->dead++;
+		sem_wait(s->dead_sem);
+		if (s->full)
+			s->dead++;
 	}
-	sem_post(state->dead_sem);
-	return NULL;
+	sem_post(s->dead_sem);
+	return (NULL);
 }
 
 static void		create_threads(t_state *state)
 {
-	int i;
-	pthread_t dead_pid;
+	int			i;
+	pthread_t	dead_pid;
 
 	state->start = get_time();
 	i = -1;
-	sem_unlink("/forks");
-	sem_unlink("/write");
-	sem_unlink("/dead");
-	state->forks_sem = sem_open("/forks", O_CREAT | O_EXCL, S_IRWXU, state->num);
-	state->write_sem = sem_open("/write", O_CREAT | O_EXCL, S_IRWXU, 1);
-	state->dead_sem = sem_open("/dead", O_CREAT | O_EXCL, S_IRWXU, 1);
 	while (++i < state->num)
-		pthread_create(&state->philos[i]->pid, NULL, &routine, state->philos[i]);
-	i = -1;
+		pthread_create(&state->philos[i]->pid, NULL, \
+			&routine, state->philos[i]);
 	pthread_create(&dead_pid, NULL, &check, state);
 	pthread_join(dead_pid, NULL);
+	i = -1;
 	while (++i < state->num)
 		pthread_join(state->philos[i]->pid, NULL);
 }
@@ -104,9 +71,8 @@ int				main(int argc, char **argv)
 	t_state *state;
 
 	state = NULL;
-	if (argc != 5 && argc != 6)
+	if ((argc != 5 && argc != 6) || !(state = init_state(argc, argv)))
 		return (ft_exit(state, "errer: invalid arguments\n"));
-	state = init_state(argc, argv);
 	create_threads(state);
 	return (ft_exit(state, NULL));
 }
